@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": ".",
+		}
+	],
+	"settings": {
+		"todo-tree.highlights.defaultHighlight": {
+			"type": "text-and-comment"
+		},
+		"todo-tree.general.tags": [
+			"TODO",
+			"REVIEW",
+			"FIXME",
+			"REMOVE"
+		],
+		"todo-tree.highlights.customHighlight": {
+			"TODO":{
+					"icon": "check",
+					"iconColour": "green",
+					"foreground": "black",
+					"background": "green"
+			},
+			"REVIEW":{
+					"icon": "eye",
+					"iconColour": "#0393f3",
+					"foreground": "black",
+					"background": "#0393f3"
+			}
+		},
+		"cmake.options.statusBarVisibility": "compact"
+	}
+}
