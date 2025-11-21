@@ -14,6 +14,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(HASHMAP_DEBUG)
 endif()
 
+# REVIEW: need for sub directories? manageable enough with 1 cmakelists i think
 # Add the source and test directories
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(example)

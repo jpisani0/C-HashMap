@@ -8,3 +8,14 @@
  * @copyright Copyright (c) 2025
  * 
  */
+
+#include <stdio.h>
+
+#include "hashmap.h"
+
+int main()
+{
+
+
+    return 0;
+}
