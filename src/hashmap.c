@@ -31,14 +31,16 @@ typedef struct node
     struct node* next;  // Pointer to next node in this linked list in the event of a collision
 }node_t;
 
+// Bucket for an index of the map
 typedef struct bucket
 {
     node_t* head;  // Pointer to the head of the linked list for this bucket
 }bucket_t;
 
+// The hashmap structure. Obfuscated from the user
 struct hashmap
 {
-    size_t capacity;    // Maximum capicity of the map
+    size_t capacity;    // Maximum capacity of the map
     size_t size;        // Current size of the map
     bucket_t* buckets;  // Array of buckets for the map
     uint32_t seed;      // Seed for the hashes
@@ -49,18 +51,18 @@ struct hashmap
 /**
  * @brief Creates the hashmap_t object and returns the handle
  * 
- * @param size 
+ * @param capacity - max number of unique indexes for the map 
  * @return hashmap_t* - pointer to the hashmap_t object. NULL if error.
  */
-hashmap_t* hashmap_create(size_t capicity)
+hashmap_t* hashmap_create(size_t capacity)
 {
     hashmap_t* map = (hashmap_t *)calloc(1, sizeof(hashmap_t));
 
     if(map != NULL)
     {
-        map->capacity = capicity;
+        map->capacity = capacity;
         map->size = 0;
-        map->buckets = (bucket_t *)calloc(capicity, sizeof(bucket_t));
+        map->buckets = (bucket_t *)calloc(capacity, sizeof(bucket_t));
         map->seed = 0;
     }
 

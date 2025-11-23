@@ -13,9 +13,23 @@
 
 #include "hashmap.h"
 
+#define PASS 0
+#define FAILURE -1
+
+const char* separator = "-----------------------------------------\n";
+
+/**
+ * @brief Entry point for the test driver
+ * 
+ * @return int 
+ */
 int main()
 {
+    const char* function_name = "hashmap_test():";
 
+    hashmap_t* map = hashmap_create(20000);
+
+    if(map == NULL) return FAILURE;
 
     return 0;
 }
