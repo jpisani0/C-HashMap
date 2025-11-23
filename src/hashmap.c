@@ -108,7 +108,7 @@ void hashmap_destroy(hashmap_t* map, free_value_func func)
  * @param value - value for the pair
  * @return STATUS 
  */
-STATUS hashmap_push(hashmap_t* map, const char* key, const void* value)
+STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
 {
     if(map == NULL || key == NULL || value == NULL) return ERROR;
 
