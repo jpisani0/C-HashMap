@@ -253,6 +253,17 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
 }
 
 /**
+ * @brief Set the seed for this map
+ * 
+ * @param map - pointer to the map
+ * @param seed - the seed for the map
+ */
+void hashmap_set_seed(hashmap_t* map, size_t seed)
+{
+    map->seed = seed;
+}
+
+/**
  * @brief Returns the current errno
  * 
  * @return hashmap_err_t - the errno enum

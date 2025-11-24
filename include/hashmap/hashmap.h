@@ -36,6 +36,7 @@ void hashmap_destroy(hashmap_t* map, free_value_func func);
 STATUS hashmap_push(hashmap_t* map, const char* key, void* value);
 void* hashmap_get(const hashmap_t* map, const char* key);
 STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func);
+void hashmap_set_seed(hashmap_t* map, size_t seed);
 hashmap_err_t hashmap_errno(void);
 const char* hashmap_strerror(hashmap_err_t errno);
 
