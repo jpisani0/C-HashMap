@@ -31,7 +31,7 @@ typedef struct node
     struct node* next;  // Pointer to next node in this linked list in the event of a collision
 }node_t;
 
-// Bucket for an index of the map
+// Linked list for an index of the map
 typedef struct bucket
 {
     node_t* head;  // Pointer to the head of the linked list for this bucket
@@ -58,12 +58,19 @@ hashmap_t* hashmap_create(size_t capacity)
 {
     hashmap_t* map = (hashmap_t *)calloc(1, sizeof(hashmap_t));
 
-    if(map != NULL)
+    if(map != NULL && capacity > 0)
     {
         map->capacity = capacity;
         map->size = 0;
         map->buckets = (bucket_t *)calloc(capacity, sizeof(bucket_t));
         map->seed = 0;
+
+        // Check that the buckets array was allocated correctly
+        if(map->buckets == NULL)
+        {
+            free(map);
+            map = NULL;
+        }
     }
 
     return map;
@@ -79,23 +86,27 @@ void hashmap_destroy(hashmap_t* map, free_value_func func)
 {
     if(map != NULL)
     {
-        // Index through the linked list of all buckets
-        for(size_t bucket_idx = 0; bucket_idx < map->capacity; bucket_idx++)
+        if(map->buckets != NULL)
         {
-            node_t* current = map->buckets[bucket_idx].head;
-
-            while(current != NULL)
+            // Index through the linked list of all buckets
+            for(size_t bucket_idx = 0; bucket_idx < map->capacity; bucket_idx++)
             {
-                node_t* next = current->next;
+                node_t* current = map->buckets[bucket_idx].head;
 
-                free(current->key);
-                if(func != NULL) func(current->value);
-                free(current);
-                current = next;
+                while(current != NULL)
+                {
+                    node_t* next = current->next;
+
+                    free(current->key);
+                    if(func != NULL) func(current->value);
+                    free(current);
+                    current = next;
+                }
             }
+
+            free(map->buckets);
         }
 
-        free(map->buckets);
         free(map);
     }
 }
