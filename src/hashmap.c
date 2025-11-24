@@ -23,6 +23,8 @@
 
 //---------------------------------------------------------------------------------------------------------
 
+static hashmap_err_t errno = HASHMAP_ERR_NONE;  // Last error from the hashmap library initialized to HASHMAP_ERR_NONE
+
 // Key-value pair in each bucket for collisions
 typedef struct node
 {
@@ -56,21 +58,37 @@ struct hashmap
  */
 hashmap_t* hashmap_create(size_t capacity)
 {
-    hashmap_t* map = (hashmap_t *)calloc(1, sizeof(hashmap_t));
+    hashmap_t* map = NULL;
 
-    if(map != NULL && capacity > 0)
+    // Check for valid capacity
+    if(capacity > 0)
     {
-        map->capacity = capacity;
-        map->size = 0;
-        map->buckets = (bucket_t *)calloc(capacity, sizeof(bucket_t));
-        map->seed = 0;
+        map = (hashmap_t *)calloc(1, sizeof(hashmap_t));
 
-        // Check that the buckets array was allocated correctly
-        if(map->buckets == NULL)
+        // Check memory allocation succeeded
+        if(map != NULL)
         {
-            free(map);
-            map = NULL;
+            map->capacity = capacity;
+            map->size = 0;
+            map->buckets = (bucket_t *)calloc(capacity, sizeof(bucket_t));
+            map->seed = 0;
+
+            // Check that the buckets array was allocated successfully
+            if(map->buckets == NULL)
+            {
+                free(map);
+                map = NULL;
+                errno = HASHMAP_ERR_ALLOC_FAILED;
+            }
         }
+        else
+        {
+            errno = HASHMAP_ERR_ALLOC_FAILED;
+        }
+    }
+    else
+    {
+        errno = HASHMAP_ERR_INVALID_CAPACITY;
     }
 
     return map;
@@ -121,7 +139,11 @@ void hashmap_destroy(hashmap_t* map, free_value_func func)
  */
 STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
 {
-    if(map == NULL || key == NULL || value == NULL) return ERROR;
+    if(map == NULL || key == NULL || value == NULL)
+    {
+        errno = HASHMAP_ERR_NULL_ARG;
+        return ERROR;
+    }
 
     uint32_t hash[4] = {0};
     size_t bucket_idx = 0;
@@ -129,12 +151,25 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
     new_node = (node_t *)calloc(1, sizeof(node_t));
 
     // REVIEW: better error codes
-    if(new_node == NULL) return ERROR;
+    if(new_node == NULL)
+    {
+        errno = HASHMAP_ERR_ALLOC_FAILED;
+        return ERROR;
+    }
 
     hash_func((void *)key, strlen(key), map->seed, hash);
     bucket_idx = hash[0] % map->capacity;
 
     new_node->key = strdup(key);
+
+    // Although unlikely, strdup() could return NULL
+    if(new_node->key == NULL)
+    {
+        free(new_node);
+        errno = HASHMAP_ERR_ALLOC_FAILED;
+        return ERROR;
+    }
+
     new_node->value = value;
     new_node->next = map->buckets[bucket_idx].head;
     map->buckets[bucket_idx].head = new_node;
@@ -152,7 +187,11 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
  */
 void* hashmap_get(const hashmap_t* map, const char* key)
 {
-    if(map == NULL || key == NULL) return NULL;
+    if(map == NULL || key == NULL)
+    {
+        errno = HASHMAP_ERR_NULL_ARG;
+        return NULL;
+    }
 
     uint32_t hash[4] = {0};
     hash_func((void *)key, strlen(key), map->seed, hash);
@@ -164,12 +203,7 @@ void* hashmap_get(const hashmap_t* map, const char* key)
         current = current->next;
     }
 
-    if(current != NULL)
-    {
-        return current->value;
-    }
-
-    return NULL;
+    return current->value;
 }
 
 /**
@@ -182,7 +216,11 @@ void* hashmap_get(const hashmap_t* map, const char* key)
  */
 STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
 {
-    if(map == NULL || key == NULL) return ERROR;
+    if(map == NULL || key == NULL)
+    {
+        errno = HASHMAP_ERR_NULL_ARG;
+        return ERROR;
+    }
 
     uint32_t hash[4] = {0};
     hash_func((void *)key, strlen(key), map->seed, hash);
@@ -197,7 +235,11 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
         current = current->next;
     }
 
-    if(current == NULL) return ERROR;
+    if(current == NULL)
+    {
+        errno = HASHMAP_ERR_NOT_FOUND;
+        return ERROR;
+    }
 
     // Make next of prev to next of current to remove from list
     prev->next = current->next;
@@ -208,6 +250,35 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
     free(current);
 
     return SUCCESS;
+}
+
+/**
+ * @brief Returns the current errno
+ * 
+ * @return hashmap_err_t - the errno enum
+ */
+hashmap_err_t hashmap_errno(void)
+{
+    return errno;
+}
+
+/**
+ * @brief Returns the current errno in string format
+ * 
+ * hashmap_err_t errno - the error number
+ * @return const char* - error number in string format
+ */
+const char* hashmap_strerror(hashmap_err_t errno)
+{
+    switch(errno)
+    {
+        case HASHMAP_ERR_NONE:          return (char *)"NO ERROR";
+        case HASHMAP_ERR_NULL_ARG:      return (char *)"NULL ARGUMENT";
+        case HASHMAP_ERR_ALLOC_FAILED:  return (char *)"MEMORY ALLOCATION FAILURE";
+        case HASHMAP_ERR_KEY_EXISTS:    return (char *)"KEY ALREADY EXISTS";
+        case HASHMAP_ERR_NOT_FOUND:     return (char *)"KEY NOT FOUND";
+        default:                        return (char *)"UNKNOWN ERROR";
+    }
 }
 
 //---------------------------------------------------------------------------------------------------------

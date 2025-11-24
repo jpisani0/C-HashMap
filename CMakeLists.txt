@@ -41,3 +41,5 @@ target_include_directories(hashmap_test PRIVATE include/hashmap)
 add_executable(hashmap_example example/example.c)
 target_link_libraries(hashmap_example PRIVATE hashmap)
 target_include_directories(hashmap_example PRIVATE include/hashmap)
+
+# if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)

@@ -21,10 +21,22 @@ typedef int STATUS;
 #define SUCCESS 0
 #define ERROR -1
 
+typedef enum HASHMAP_ERROR_TYPE
+{
+    HASHMAP_ERR_NONE,           // No error
+    HASHMAP_ERR_INVALID_CAPACITY,   // Invalid capacity for hashmap given (<1)
+    HASHMAP_ERR_NULL_ARG,       // Null argument provided
+    HASHMAP_ERR_ALLOC_FAILED,   // Memory allocation failed
+    HASHMAP_ERR_KEY_EXISTS,     // Attempting to add key that already exists
+    HASHMAP_ERR_NOT_FOUND,      // Key provided not found in the map
+}hashmap_err_t;
+
 hashmap_t* hashmap_create(size_t size);
 void hashmap_destroy(hashmap_t* map, free_value_func func);
 STATUS hashmap_push(hashmap_t* map, const char* key, void* value);
 void* hashmap_get(const hashmap_t* map, const char* key);
 STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func);
+hashmap_err_t hashmap_errno(void);
+const char* hashmap_strerror(hashmap_err_t errno);
 
 #endif
