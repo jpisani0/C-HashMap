@@ -58,6 +58,7 @@ struct hashmap
  */
 hashmap_t* hashmap_create(size_t capacity)
 {
+    errno = HASHMAP_ERR_NONE;
     hashmap_t* map = NULL;
 
     // Check for valid capacity
@@ -102,6 +103,8 @@ hashmap_t* hashmap_create(size_t capacity)
  */
 void hashmap_destroy(hashmap_t* map, free_value_func func)
 {
+    errno = HASHMAP_ERR_NONE;
+
     if(map != NULL)
     {
         if(map->buckets != NULL)
@@ -145,6 +148,7 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
         return ERROR;
     }
 
+    errno = HASHMAP_ERR_NONE;
     uint32_t hash[4] = {0};
     size_t bucket_idx = 0;
     node_t* new_node = NULL;
@@ -193,6 +197,7 @@ void* hashmap_get(const hashmap_t* map, const char* key)
         return NULL;
     }
 
+    errno = HASHMAP_ERR_NONE;
     uint32_t hash[4] = {0};
     hash_func((void *)key, strlen(key), map->seed, hash);
     size_t bucket_idx = hash[0] % map->capacity;
@@ -222,6 +227,7 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
         return ERROR;
     }
 
+    errno = HASHMAP_ERR_NONE;
     uint32_t hash[4] = {0};
     hash_func((void *)key, strlen(key), map->seed, hash);
     size_t bucket_idx = hash[0] % map->capacity;

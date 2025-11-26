@@ -23,12 +23,12 @@ typedef int STATUS;
 
 typedef enum HASHMAP_ERROR_TYPE
 {
-    HASHMAP_ERR_NONE,           // No error
-    HASHMAP_ERR_INVALID_CAPACITY,   // Invalid capacity for hashmap given (<1)
-    HASHMAP_ERR_NULL_ARG,       // Null argument provided
-    HASHMAP_ERR_ALLOC_FAILED,   // Memory allocation failed
-    HASHMAP_ERR_KEY_EXISTS,     // Attempting to add key that already exists
-    HASHMAP_ERR_NOT_FOUND,      // Key provided not found in the map
+    HASHMAP_ERR_NONE,             // No error
+    HASHMAP_ERR_INVALID_CAPACITY, // Invalid capacity for hashmap given (<1)
+    HASHMAP_ERR_NULL_ARG,         // Null argument provided
+    HASHMAP_ERR_ALLOC_FAILED,     // Memory allocation failed
+    HASHMAP_ERR_KEY_EXISTS,       // Attempting to add key that already exists
+    HASHMAP_ERR_NOT_FOUND,        // Key provided not found in the map
 }hashmap_err_t;
 
 hashmap_t* hashmap_create(size_t size);
