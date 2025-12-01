@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "hashmap.h"
 
@@ -81,23 +82,23 @@ int main(void)
  */
 STATUS setupAndAddAccounts(hashmap_t* map)
 {
-    Account* acc1 = (Account *)calloc(1, sizeof(Account));
-    Account* acc2 = (Account *)calloc(1, sizeof(Account));
-    Account* acc3 = (Account *)calloc(1, sizeof(Account));
+    Account* acc1 = (Account *)malloc(sizeof(Account));
+    Account* acc2 = (Account *)malloc(sizeof(Account));
+    Account* acc3 = (Account *)malloc(sizeof(Account));
 
     if(acc1 == NULL || acc2 == NULL || acc3 == NULL) return ERROR;
 
     acc1->acc_number = 1;
-    acc1->name = "John Smith";
-    acc1->email = "jsmith@email.com";
+    acc1->name = strdup("John Smith");
+    acc1->email = strdup("jsmith@email.com");
 
     acc2->acc_number = 2;
-    acc2->name = "Jane Doe";
-    acc2->email = "jdoe@email.com";
+    acc2->name = strdup("Jane Doe");
+    acc2->email = strdup("jdoe@email.com");
 
     acc3->acc_number = 3;
-    acc3->name = "Steven Stevenson";
-    acc3->email = "sstevenson@email.com";
+    acc3->name = strdup("Steven Stevenson");
+    acc3->email = strdup("sstevenson@email.com");
 
     return (hashmap_push(map, acc1->email, (void *)acc1) || hashmap_push(map, acc2->email, (void *)acc2) || hashmap_push(map, acc3->email, (void *)acc3));
 }
@@ -105,9 +106,12 @@ STATUS setupAndAddAccounts(hashmap_t* map)
 /**
  * @brief Frees the account struct
  * 
- * @param acc - pointer to the Account struct to be freed
+ * @param ptr - pointer to the Account struct to be freed
  */
-void freeAccount(void* acc)
+void freeAccount(void* ptr)
 {
+    Account* acc = (Account *)ptr;
+    free(acc->name);
+    free(acc->email);
 	free(acc);
 }

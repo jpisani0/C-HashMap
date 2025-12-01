@@ -15,6 +15,8 @@
 #include "hashmap.h"
 #include "murmur3.h"
 
+#define MAX_HASHMAP_CAPACITY 4294967296 // 2^32. In 32 bit arch, hashing algo only outputs 32 bit hashes. In 64 bit arch, we only use the first 32 bits of the 128 bit output.
+
 #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) // 64 bit architecture
     #define hash_func(key, len, seed, hash) MurmurHash3_x64_128(key, len, seed, hash)
 #else // 32 bit architecture
@@ -23,21 +25,22 @@
 
 //---------------------------------------------------------------------------------------------------------
 
-static hashmap_err_t errno = HASHMAP_ERR_NONE;  // Last error from the hashmap library initialized to HASHMAP_ERR_NONE
+typedef struct node node_t;
+typedef struct bucket bucket_t;
 
 // Key-value pair in each bucket for collisions
-typedef struct node
+struct node
 {
     char* key;          // Key of this node
     void* value;        // Value of this node
-    struct node* next;  // Pointer to next node in this linked list in the event of a collision
-}node_t;
+    node_t* next;  // Pointer to next node in this linked list in the event of a collision
+};
 
 // Linked list for an index of the map
 typedef struct bucket
 {
     node_t* head;  // Pointer to the head of the linked list for this bucket
-}bucket_t;
+};
 
 // The hashmap structure. Obfuscated from the user
 struct hashmap
@@ -47,6 +50,8 @@ struct hashmap
     bucket_t* buckets;  // Array of buckets for the map
     uint32_t seed;      // Seed for the hashes
 };
+
+static hashmap_err_t errno = HASHMAP_ERR_NONE;  // Last error from the hashmap library initialized to HASHMAP_ERR_NONE
 
 //---------------------------------------------------------------------------------------------------------
 
@@ -62,9 +67,9 @@ hashmap_t* hashmap_create(size_t capacity)
     hashmap_t* map = NULL;
 
     // Check for valid capacity
-    if(capacity > 0)
+    if(capacity <= MAX_HASHMAP_CAPACITY)
     {
-        map = (hashmap_t *)calloc(1, sizeof(hashmap_t));
+        map = (hashmap_t *)malloc(sizeof(hashmap_t));
 
         // Check memory allocation succeeded
         if(map != NULL)
@@ -132,6 +137,7 @@ void hashmap_destroy(hashmap_t* map, free_value_func func)
     }
 }
 
+// TODO: catch duplicates
 /**
  * @brief Add a new key-value pair to the map
  * 
@@ -151,11 +157,11 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
     errno = HASHMAP_ERR_NONE;
     uint32_t hash[4] = {0};
     size_t bucket_idx = 0;
-    node_t* new_node = NULL;
-    new_node = (node_t *)calloc(1, sizeof(node_t));
+    node_t* node = NULL;
+    node = (node_t *)malloc(sizeof(node_t));
 
     // REVIEW: better error codes
-    if(new_node == NULL)
+    if(node == NULL)
     {
         errno = HASHMAP_ERR_ALLOC_FAILED;
         return ERROR;
@@ -164,19 +170,21 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
     hash_func((void *)key, strlen(key), map->seed, hash);
     bucket_idx = hash[0] % map->capacity;
 
-    new_node->key = strdup(key);
+    node->key = strdup(key);
 
     // Although unlikely, strdup() could return NULL
-    if(new_node->key == NULL)
+    if(node->key == NULL)
     {
-        free(new_node);
+        free(node);
         errno = HASHMAP_ERR_ALLOC_FAILED;
         return ERROR;
     }
 
-    new_node->value = value;
-    new_node->next = map->buckets[bucket_idx].head;
-    map->buckets[bucket_idx].head = new_node;
+    node->value = value;
+
+    // Insert into bucket at head of linked list
+    node->next = map->buckets[bucket_idx].head;
+    map->buckets[bucket_idx].head = node;
     map->size++;
 
     return SUCCESS;
@@ -203,6 +211,7 @@ void* hashmap_get(const hashmap_t* map, const char* key)
     size_t bucket_idx = hash[0] % map->capacity;
     node_t* current = map->buckets[bucket_idx].head;
 
+    // Loop until end of list is reached or node with same key is found
     while((current != NULL) && (strcmp(current->key, key) != 0))
     {
         current = current->next;
