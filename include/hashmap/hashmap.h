@@ -33,7 +33,7 @@ typedef enum HASHMAP_ERROR_TYPE
 
 hashmap_t* hashmap_create(size_t size);
 void hashmap_destroy(hashmap_t* map, free_value_func func);
-STATUS hashmap_push(hashmap_t* map, const char* key, void* value);
+STATUS hashmap_push(hashmap_t* map, const char* key, const void* value);
 void* hashmap_get(const hashmap_t* map, const char* key);
 STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func);
 void hashmap_set_seed(hashmap_t* map, size_t seed);
