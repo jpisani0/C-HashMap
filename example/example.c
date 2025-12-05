@@ -66,8 +66,7 @@ int main(void)
     }
 
     // Here we pass the void freeAccount(void*) function by reference to the hashmap_destroy() function for freeing our values. 
-    // In this case, we could have just passed free() as the only thing allocated dynamically was the struct itself and none of its fields.
-    // If your values do no have anything allocated dynamically with malloc(), calloc(), or realloc(), you can pass NULL instead.
+    // If your value is simple, you can just pass free(). If your value is not dynamically allocated, you can pass NULL to not free anything.
     hashmap_destroy(map, freeAccount);
     map = NULL;
 
