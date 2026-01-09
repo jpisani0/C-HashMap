@@ -37,7 +37,7 @@ struct node
 };
 
 // Linked list for an index of the map
-typedef struct bucket
+struct bucket
 {
     node_t* head;  // Pointer to the head of the linked list for this bucket
 };
@@ -67,7 +67,7 @@ hashmap_t* hashmap_create(size_t capacity)
     hashmap_t* map = NULL;
 
     // Check for valid capacity
-    if(capacity <= MAX_HASHMAP_CAPACITY)
+    if(capacity <= MAX_HASHMAP_CAPACITY && capacity > 0)
     {
         map = (hashmap_t *)malloc(sizeof(hashmap_t));
 
@@ -104,9 +104,9 @@ hashmap_t* hashmap_create(size_t capacity)
  * @brief Safely deallocates map. User can optionally provide a function for freeing values.
  * 
  * @param map - pointer to the map
- * @param func - optional pointer to function for freeing values. Can pass NULL to not have library handle freeing values.
+ * @param fn - optional pointer to function for freeing values. Can pass NULL to not have library handle freeing values.
  */
-void hashmap_destroy(hashmap_t* map, free_value_func func)
+void hashmap_destroy(hashmap_t* map, free_value_fn_t fn)
 {
     errno = HASHMAP_ERR_NONE;
 
@@ -124,7 +124,7 @@ void hashmap_destroy(hashmap_t* map, free_value_func func)
                     node_t* next = current->next;
 
                     free(current->key);
-                    if(func != NULL) func(current->value);
+                    if(fn != NULL) fn(current->value);
                     free(current);
                     current = next;
                 }
@@ -225,10 +225,10 @@ void* hashmap_get(const hashmap_t* map, const char* key)
  * 
  * @param map - pointer to the map
  * @param key - key to be deleted
- * @param func - optional function for freeing the value. Can be left NULL if user plans to handle deallocation.
+ * @param fn - optional function for freeing the value. Can be left NULL if user plans to handle deallocation.
  * @return STATUS 
  */
-STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
+STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_fn_t fn)
 {
     if(map == NULL || key == NULL)
     {
@@ -261,7 +261,7 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func)
 
     // Free current
     free(current->key);
-    if(func != NULL) func(current->value);
+    if(fn != NULL) fn(current->value);
     free(current);
 
     return SUCCESS;

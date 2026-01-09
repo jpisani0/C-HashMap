@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 
-typedef void (*free_value_func)(void *);
+typedef void (*free_value_fn_t)(void *);
 typedef struct hashmap hashmap_t;
 typedef int STATUS;
 
@@ -31,13 +31,21 @@ typedef enum HASHMAP_ERROR_TYPE
     HASHMAP_ERR_NOT_FOUND,        // Key provided not found in the map
 }hashmap_err_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 hashmap_t* hashmap_create(size_t size);
-void hashmap_destroy(hashmap_t* map, free_value_func func);
+void hashmap_destroy(hashmap_t* map, free_value_fn_t func);
 STATUS hashmap_push(hashmap_t* map, const char* key, void* value);
 void* hashmap_get(const hashmap_t* map, const char* key);
-STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_func func);
+STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_fn_t func);
 void hashmap_set_seed(hashmap_t* map, size_t seed);
 hashmap_err_t hashmap_errno(void);
 const char* hashmap_strerror(hashmap_err_t errno);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
