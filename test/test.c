@@ -9,27 +9,34 @@
  * 
  */
 
-#include <stdio.h>
+#include "test.h"
 
-#include "hashmap.h"
-
-#define PASS 0
-#define FAILURE -1
-
-const char* separator = "-----------------------------------------\n";
+extern const test __start_test_files[];
+extern const test __stop_test_files[];
 
 /**
  * @brief Entry point for the test driver
  * 
  * @return int 
  */
-int main()
+int main(void)
 {
     const char* function_name = "hashmap_test():";
+    STATUS error_status = SUCCESS;
 
-    hashmap_t* map = hashmap_create(20000);
+    for(const test *t = __start_test_files; t < __stop_test_files; t++)
+    {
+        if(t->fn() == ERROR) { error_status = ERROR; }
+    }
 
-    if(map == NULL) return FAILURE;
+    if(error_status == ERROR)
+    {
+        printf("%s tests failed with errors\n", function_name);
+    }
+    else
+    {
+        printf("%s all tests passed successfully!\n", function_name);
+    }
 
     return 0;
 }
