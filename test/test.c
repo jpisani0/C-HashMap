@@ -9,6 +9,8 @@
  * 
  */
 
+#include <stdio.h>
+
 #include "test.h"
 
 extern const test __start_test_files[];
@@ -26,7 +28,16 @@ int main(void)
 
     for(const test *t = __start_test_files; t < __stop_test_files; t++)
     {
-        if(t->fn() == ERROR) { error_status = ERROR; }
+        print_test_start(t->file_path, t->line_number, t->name);
+
+        if(t->fn() == ERROR)
+        {
+            col_print("ERROR\n", COL_RED);
+        }
+        else
+        {
+            col_print("OK\n", COL_GREEN);
+        }
     }
 
     if(error_status == ERROR)

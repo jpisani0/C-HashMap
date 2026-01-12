@@ -12,25 +12,19 @@
 #ifndef _TEST_HASHMAP_H
 #define _TEST_HASHMAP_H
 
-#include <stdio.h>
-
 #include "hashmap.h"
 #include "color.h"
 
-#define PRINT_SEPARATOR() printf("-----------------------------------------\n")
-
-#define PRINT_TEST_START(file_name) \
-        printf("\n"); \
-        PRINT_SEPARATOR(); \
-        printf("-------- START %s TEST CASES --------\n", file_name); \
-        PRINT_SEPARATOR()
+void print_test_start(const char* file_path, int line_number, const char* test_name);
+const char* get_file_basename(const char* file_path);
+void col_print(const char* str, const char* color);
 
 typedef STATUS (*test_fn_t)(void);
 
 typedef struct TEST
 {
     const char* name;
-    const char* file_name;
+    const char* file_path;
     int line_number;
     test_fn_t fn;
 }test;
