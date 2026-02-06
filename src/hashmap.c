@@ -137,7 +137,6 @@ void hashmap_destroy(hashmap_t* map, free_value_fn_t fn)
     }
 }
 
-// TODO: catch duplicates
 /**
  * @brief Add a new key-value pair to the map
  * 
@@ -160,10 +159,16 @@ STATUS hashmap_push(hashmap_t* map, const char* key, void* value)
     node_t* node = NULL;
     node = (node_t *)malloc(sizeof(node_t));
 
-    // REVIEW: better error codes
     if(node == NULL)
     {
         errno = HASHMAP_ERR_ALLOC_FAILED;
+        return ERROR;
+    }
+
+    // Catch duplicate keys
+    if(hashmap_get(map, key) != NULL)
+    {
+        errno = HASHMAP_ERR_DUPLICATE;
         return ERROR;
     }
 
@@ -217,7 +222,7 @@ void* hashmap_get(const hashmap_t* map, const char* key)
         current = current->next;
     }
 
-    return current->value;
+    return (current ? current->value : NULL);
 }
 
 /**
@@ -291,10 +296,9 @@ hashmap_err_t hashmap_errno(void)
 /**
  * @brief Returns the current errno in string format
  * 
- * hashmap_err_t errno - the error number
  * @return const char* - error number in string format
  */
-const char* hashmap_strerror(hashmap_err_t errno)
+const char* hashmap_strerror(void)
 {
     switch(errno)
     {
@@ -303,6 +307,7 @@ const char* hashmap_strerror(hashmap_err_t errno)
         case HASHMAP_ERR_ALLOC_FAILED:  return (char *)"MEMORY ALLOCATION FAILURE";
         case HASHMAP_ERR_KEY_EXISTS:    return (char *)"KEY ALREADY EXISTS";
         case HASHMAP_ERR_NOT_FOUND:     return (char *)"KEY NOT FOUND";
+        case HASHMAP_ERR_DUPLICATE:     return (char *)"DUPLICATE KEY";
         default:                        return (char *)"UNKNOWN ERROR";
     }
 }
