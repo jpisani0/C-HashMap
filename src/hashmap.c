@@ -222,7 +222,13 @@ void* hashmap_get(const hashmap_t* map, const char* key)
         current = current->next;
     }
 
-    return (current ? current->value : NULL);
+    if(current == NULL)
+    {
+        errno = HASHMAP_ERR_NOT_FOUND;
+        return NULL;
+    }
+
+    return current->value;
 }
 
 /**
@@ -261,8 +267,19 @@ STATUS hashmap_delete(hashmap_t* map, const char* key, free_value_fn_t fn)
         return ERROR;
     }
 
-    // Make next of prev to next of current to remove from list
-    prev->next = current->next;
+    // Check if this node is the head of the list
+    if(prev == NULL)
+    {
+        // Make next node the new head of the list
+        map->buckets[bucket_idx].head = current->next;
+    }
+    else
+    {
+        // Else, make next of prev to next of current
+        prev->next = current->next;
+    }
+
+    map->size--;
 
     // Free current
     free(current->key);

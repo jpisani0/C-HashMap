@@ -10,11 +10,13 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "test.h"
 
-extern const test __start_test_files[];
-extern const test __stop_test_files[];
+extern const test_t __start_test_cases[];
+extern const test_t __stop_test_cases[];
+
 
 /**
  * @brief Entry point for the test driver
@@ -26,18 +28,21 @@ int main(void)
     const char* function_name = "hashmap_test():";
     STATUS error_status = SUCCESS;
 
-    for(const test *t = __start_test_files; t < __stop_test_files; t++)
+    for(const test_t *t = __start_test_cases; t < __stop_test_cases; t++)
     {
         print_test_start(t->file_path, t->line_number, t->name);
 
         if(t->fn() == ERROR)
         {
-            col_print("ERROR\n", COL_RED);
+            col_print("FAIL\n", COL_RED);
+            error_status = ERROR;
         }
         else
         {
             col_print("OK\n", COL_GREEN);
         }
+
+
     }
 
     if(error_status == ERROR)

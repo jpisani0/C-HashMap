@@ -14,8 +14,6 @@
 
 #include "test.h"
 
-#define MAX_STRING 128
-
 
 /**
  * @brief Prints the test start message
@@ -28,6 +26,8 @@ inline void print_test_start(const char* file_path, int line_number, const char*
 {
     char buffer[MAX_STRING] = {0};
 
+    printf("[");
+
     snprintf(buffer, MAX_STRING, "%s", get_file_basename(file_path));
     col_print(buffer, COL_BLUE);
 
@@ -36,7 +36,7 @@ inline void print_test_start(const char* file_path, int line_number, const char*
     snprintf(buffer, MAX_STRING, "%d", line_number);
     col_print(buffer, COL_YELLOW);
 
-    printf(": Starting test: ");
+    printf("] Starting test: ");
 
     snprintf(buffer, MAX_STRING, "%s  ", test_name);
     col_print(buffer, COL_MAGENTA);

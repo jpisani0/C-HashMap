@@ -9,39 +9,8 @@
  * 
  */
 
-#define TEST_SECTION "test_hashmap_create_section"
-
 #include "test.h"
-#include <stdio.h>
 
-REGISTER_TEST_FILE(test_hashmap_create)
-
-/**
- * @brief Test passing a capacity of 0 to hashmap_create().
- * @details A capacity of 0 is invalid and should return NULL and errno should be HASHMAP_ERR_INVALID_CAPACITY
- * 
- * @return STATUS - SUCCESS or ERROR
- */
-// STATUS test_zero_capacity(void)
-// {
-//     const char* function_name = "test_zero_capacity():";
-//     hashmap_t* map = hashmap_create(0);
-//     STATUS error_status = SUCCESS;
-
-//     if(map != NULL)
-//     {
-//         printf("%s FAILED: map is not NULL!\n", function_name);
-//         error_status = ERROR;
-//     }
-
-//     if(hashmap_errno() != HASHMAP_ERR_INVALID_CAPACITY)
-//     {
-//         printf("%s FAILED: errno is not HASHMAP_ERR_INVALID_CAPACITY!\n", function_name);
-//         error_status = ERROR;
-//     }
-
-//     return error_status;
-// }
 
 /**
  * @brief Test passing a capacity of 0 to hashmap_create().
@@ -54,7 +23,19 @@ REGISTER_TEST(zero_capacity_test)
     STATUS error_status = SUCCESS;
     hashmap_t* map = hashmap_create(0);
 
-    if(map != NULL) { error_status = ERROR; }
+    if(map != NULL) 
+    { 
+        PRINT_ERR("map is not null");
+        error_status = ERROR; 
+    }
+
+    if(hashmap_errno() != HASHMAP_ERR_INVALID_CAPACITY)
+    {
+        PRINT_ERR("errno is not HASHMAP_ERR_INVALID_CAPCITY");
+        error_status = ERROR;
+    }
+
+    hashmap_destroy(map, NULL);
 
     return error_status;
 }
@@ -67,7 +48,7 @@ REGISTER_TEST(zero_capacity_test)
  * 
  * @return STATUS - SUCCESS or ERROR
  */
-REGISTER_TEST(test_large_capacity)
+REGISTER_TEST(large_capacity_test)
 {
     const char* function_name = "test_large_capacity():";
     hashmap_t* map = hashmap_create((size_t)4294967297UL);
@@ -75,15 +56,17 @@ REGISTER_TEST(test_large_capacity)
 
     if(map != NULL)
     {
-        printf("%s FAILED: map is not NULL!\n", function_name);
+        PRINT_ERR("map is not null");
         error_status = ERROR;
     }
 
     if(hashmap_errno() != HASHMAP_ERR_INVALID_CAPACITY)
     {
-        printf("%s FAILED: errno is not HASHMAP_ERR_INVALID_CAPACITY!\n", function_name);
+        PRINT_ERR("errno is not HASHMAP_ERR_INVALID_CAPACITY");
         error_status = ERROR;
     }
+
+    hashmap_destroy(map, NULL);
 
     return error_status;
 }

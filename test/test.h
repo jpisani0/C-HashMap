@@ -12,8 +12,14 @@
 #ifndef _TEST_HASHMAP_H
 #define _TEST_HASHMAP_H
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "hashmap.h"
 #include "color.h"
+
+#define MAX_STRING 128
 
 void print_test_start(const char* file_path, int line_number, const char* test_name);
 const char* get_file_basename(const char* file_path);
@@ -21,54 +27,33 @@ void col_print(const char* str, const char* color);
 
 typedef STATUS (*test_fn_t)(void);
 
+/**
+ * @brief Struct that holds information on the test
+ * 
+ */
 typedef struct TEST
 {
     const char* name;
     const char* file_path;
     int line_number;
     test_fn_t fn;
-}test;
-
-#ifdef TEST_SECTION
-/**
- * @brief Register a test to the test_files section to be ran in test.c
- * 
- */
-#define REGISTER_TEST_FILE(name) \
-        extern const test __start_##name##_section[]; \
-        extern const test __stop_##name##_section[]; \
-        static STATUS name(void); \
-        __attribute__((used, section("test_files"))) \
-        static const test test_##name = { \
-            #name, \
-            __FILE__, \
-            __LINE__, \
-            name \
-        }; \
-        static STATUS name(void) \
-        { \
-            STATUS error_status = SUCCESS; \
-            for(const test *t = __start_##name##_section; t < __stop_##name##_section; t++) { if(t->fn() == ERROR) { error_status = ERROR; } } \
-            return error_status; \
-        }
+}test_t;
 
 /**
- * @brief Register a test to the test file's section to be ran when its section in test_cases is called in test.c
- *        Each test file must define a section name with #define TEST_SECTION before including this file.
- * 
- *        ex) test_hashmap_create.c will have #define TEST_SECTION "tests_hashmap_create"
+ * @brief Register a test to the test_cases section to be called in test.c
  * 
  */
 #define REGISTER_TEST(name) \
         static STATUS name(void); \
-        __attribute__((used, section(TEST_SECTION))) \
-        static const test test_##name = { \
+        __attribute__((used, section("test_cases"))) \
+        static const test_t test_##name = { \
         #name, \
         __FILE__, \
         __LINE__, \
         name \
     }; \
     static STATUS name(void)
-#endif
+
+#define PRINT_ERR(err_msg) printf("\t[%s:%s()] %s\n", get_file_basename(__FILE__), __func__, err_msg)
 
 #endif
