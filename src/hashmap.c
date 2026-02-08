@@ -322,7 +322,6 @@ const char* hashmap_strerror(void)
         case HASHMAP_ERR_NONE:          return (char *)"NO ERROR";
         case HASHMAP_ERR_NULL_ARG:      return (char *)"NULL ARGUMENT";
         case HASHMAP_ERR_ALLOC_FAILED:  return (char *)"MEMORY ALLOCATION FAILURE";
-        case HASHMAP_ERR_KEY_EXISTS:    return (char *)"KEY ALREADY EXISTS";
         case HASHMAP_ERR_NOT_FOUND:     return (char *)"KEY NOT FOUND";
         case HASHMAP_ERR_DUPLICATE:     return (char *)"DUPLICATE KEY";
         default:                        return (char *)"UNKNOWN ERROR";

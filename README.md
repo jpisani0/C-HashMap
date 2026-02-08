@@ -5,23 +5,25 @@ Uses the [Murmur3](https://github.com/aappleby/smhasher) hashing function, speci
 
 ## How to use
 
+There is an example program in the `example/` directory. Below are instructions for using the C-Hashmap API.
+
 ### Creating the hashmap object
 To create the hashmap object, use:
 
 ```C
-hashmap_t* map = hashmap_create(<size>);
+hashmap_t* map = hashmap_create(size);
 ```
 
-<size> is any positive integer less than 2^32. If `hashmap_create()` fails, it will return `NULL`.
+Where `size` is any positive integer less than 2^32. If `hashmap_create()` fails, it will return `NULL`.
 
 ### Setting a seed
 To set a custom seed for the hashmap, use:
 
 ```C
-hashmap_set_seed(<seed>);
+hashmap_set_seed(map, seed);
 ```
 
-Where <seed> is your seed.
+Where `map` is your created hashmap_t* pointer and `seed` is your seed. The seed is defaulted to `0`.
 
 ### Pushing new key-value pairs
 To push a new key-value pair to the map, use:
