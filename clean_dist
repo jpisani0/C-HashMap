@@ -1,0 +1,4 @@
+#!/usr/bin/sh
+
+# Clean dist
+rm -rf dist/

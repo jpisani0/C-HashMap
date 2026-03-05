@@ -2,3 +2,6 @@
 build/
 cmake/
 bin/
+
+# Distribution
+dist/

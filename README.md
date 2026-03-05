@@ -3,6 +3,32 @@ HashMap implementation in C
 
 Uses the [Murmur3](https://github.com/aappleby/smhasher) hashing function, specifically a C implementation from [PeterScott](https://github.com/PeterScott/murmur3?tab=readme-ov-file).
 
+## How to implement
+
+### CMake
+
+To include in your project using CMake, add these lines to your project's CMakeLists.txt:
+
+```CMake
+add_subdirectory(path/to/hashmap)
+target_link_libraries(your_project PRIVATE hashmap)
+```
+
+### Manually
+
+To build the library yourself:
+
+```Bash
+gcc -c hashmap.c -o hashmap.o
+ar rcs libhashmap.a hashmap.o
+```
+
+Then build your project with:
+
+```Bash
+gcc your_project.c -Ipath/to/hashmap/include -Lpath/to/built/library -lhashmap
+```
+
 ## How to use
 
 There is an example program in the `example/` directory. Below are instructions for using the C-Hashmap API.
