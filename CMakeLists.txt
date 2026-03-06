@@ -4,6 +4,13 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name and version
 project(hashmap VERSION 1.0)
 
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    # Set the output directories
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
+
 # Gather library source files
 set(HASHMAP_SRC_FILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hashmap.c 
@@ -26,17 +33,12 @@ target_include_directories(hashmap
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/murmur3
 )
 
-# Enable strict warnings
+# Enable strict warnings for hashmap library only
 if (MSVC)
     target_compile_options(hashmap PRIVATE /W4)
 else()
     target_compile_options(hashmap PRIVATE -Wall -Wextra -Wpedantic)
 endif()
-
-# Set the output directories
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Gather example source files
